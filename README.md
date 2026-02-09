@@ -7,10 +7,12 @@ A production-ready operations dashboard for smart road maintenance. It integrate
 **Frontend (React + Vite + MUI)**
 - **Presentation layer**: Modular panels for overview metrics, virtual surveyor (depth-to-asphalt), risk predictions, budget planning, intake workflow, PDF reporting, and live operations feed.
 - **Data access**: `src/api/dashboard.ts` fetches `/api/dashboard` through Axios and falls back to mock data when needed.
+- **Actions**: `src/api/actions.ts` calls `/api/upload` for video intake and `/api/report` for contractor PDF generation.
 - **Typed contracts**: `src/api/types.ts` defines the JSON payload expected from the backend.
 
 **Backend (FastAPI-ready)**
 - The UI expects a `GET /api/dashboard` endpoint returning a consolidated dashboard payload.
+- Uploads are handled by `POST /api/upload` and reports by `POST /api/report`.
 - Configure `VITE_API_BASE_URL` to point to your API gateway.
 - The backend can use YOLOv8 detections, Depth Anything V2 depth estimation, and a knapsack optimizer for budget planning.
 
@@ -129,6 +131,18 @@ VITE_USE_MOCK=false VITE_API_BASE_URL=http://localhost:8000 npm run dev
 ```
 
 ## How to run
+
+### Backend (FastAPI)
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+```
+
+### Frontend
 
 ```bash
 npm install

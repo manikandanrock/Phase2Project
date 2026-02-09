@@ -12,6 +12,7 @@ import VirtualSurveyor from "./components/VirtualSurveyor";
 import IntakePanel from "./components/IntakePanel";
 import ReportPanel from "./components/ReportPanel";
 import { fetchDashboard } from "./api/dashboard";
+import { generateReport, uploadSurveyVideo } from "./api/actions";
 import { DashboardData } from "./api/types";
 
 const initialState: DashboardData = {
@@ -36,6 +37,8 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [reporting, setReporting] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [lastUpload, setLastUpload] = useState("Today, 08:22");
+  const [reportGeneratedAt, setReportGeneratedAt] = useState("Today, 07:50");
 
   const loadDashboard = useCallback(() => {
     setLoading(true);
@@ -52,14 +55,28 @@ function App() {
       });
   }, []);
 
-  const handleReport = useCallback(() => {
+  const handleReport = useCallback(async () => {
     setReporting(true);
-    window.setTimeout(() => setReporting(false), 1200);
+    try {
+      const report = await generateReport();
+      setReportGeneratedAt(new Date(report.generatedAt).toLocaleString());
+    } catch (err) {
+      setError(`Unable to generate report: ${(err as Error).message}`);
+    } finally {
+      setReporting(false);
+    }
   }, []);
 
-  const handleUpload = useCallback(() => {
+  const handleUpload = useCallback(async () => {
     setUploading(true);
-    window.setTimeout(() => setUploading(false), 1200);
+    try {
+      const result = await uploadSurveyVideo();
+      setLastUpload(`Just now · ${result.message}`);
+    } catch (err) {
+      setError(`Unable to upload survey video: ${(err as Error).message}`);
+    } finally {
+      setUploading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -92,7 +109,7 @@ function App() {
             </Grid>
             <Grid item xs={12} md={6}>
               <IntakePanel
-                lastUpload="Today, 08:22"
+                lastUpload={lastUpload}
                 framesProcessed={1540}
                 onUpload={handleUpload}
                 loading={uploading}
@@ -110,7 +127,7 @@ function App() {
             </Grid>
             <Grid item xs={12} md={5}>
               <Stack spacing={2}>
-                <ReportPanel generatedAt="Today, 07:50" onGenerate={handleReport} loading={reporting} />
+                <ReportPanel generatedAt={reportGeneratedAt} onGenerate={handleReport} loading={reporting} />
                 <ActivityFeed items={data.activityFeed} />
               </Stack>
             </Grid>
