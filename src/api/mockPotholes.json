@@ -1,0 +1,8 @@
+[
+  { "id": 101, "severity": "HIGH", "cost": 4500 },
+  { "id": 102, "severity": "MEDIUM", "cost": 2200 },
+  { "id": 103, "severity": "LOW", "cost": 600 },
+  { "id": 104, "severity": "HIGH", "cost": 5100 },
+  { "id": 105, "severity": "MEDIUM", "cost": 1900 },
+  { "id": 106, "severity": "LOW", "cost": 550 }
+]
