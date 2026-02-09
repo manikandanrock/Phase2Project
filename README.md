@@ -1,32 +1,71 @@
-# Gov-RoadAI Pothole Dashboard
+# Gov-RoadAI Phase 2 Dashboard
 
-A production-style React dashboard for monitoring pothole detection results, severity mix, and remediation costs. The UI ships with mock data for demos and connects to a real backend using a configurable API base URL.
+A production-ready operations dashboard for smart road maintenance. It integrates depth estimation, predictive maintenance, and automated budget planning to help municipalities act before roads fail.
 
 ## Architecture overview
 
 **Frontend (React + Vite + MUI)**
-- **Presentation layer**: Modular components for summary cards, severity chart, and inspection table.
-- **Data access**: `src/api/potholes.ts` fetches `/api/potholes` through Axios and falls back to mock data when needed.
-- **Typed contracts**: `src/api/types.ts` defines the expected payload schema for pothole findings.
+- **Presentation layer**: Modular components for overview metrics, risk predictions, budget planning, and operational feed.
+- **Data access**: `src/api/dashboard.ts` fetches `/api/dashboard` through Axios and falls back to mock data when needed.
+- **Typed contracts**: `src/api/types.ts` defines the JSON payload expected from the backend.
 
 **Backend (FastAPI-ready)**
-- The UI expects a `GET /api/potholes` endpoint returning a list of pothole objects.
+- The UI expects a `GET /api/dashboard` endpoint returning a consolidated dashboard payload.
 - Configure `VITE_API_BASE_URL` to point to your API gateway.
 
-## Data contract
+## Data contract (real backend)
 
 ```json
-[
-  { "id": 101, "severity": "HIGH", "cost": 4500 },
-  { "id": 102, "severity": "MEDIUM", "cost": 2200 },
-  { "id": 103, "severity": "LOW", "cost": 600 }
-]
+{
+  "city": "Chennai",
+  "updatedAt": "2024-09-18T09:45:00Z",
+  "summary": {
+    "totalPotholes": 182,
+    "avgDepthCm": 9.6,
+    "totalEstimatedCostInr": 1245000,
+    "budgetCapInr": 1500000,
+    "highSeverityCount": 42
+  },
+  "potholes": [
+    {
+      "id": 9101,
+      "roadName": "OMR IT Corridor",
+      "severity": "HIGH",
+      "depthCm": 12.4,
+      "areaSqm": 1.4,
+      "estimatedCostInr": 18500,
+      "detectedAt": "2024-09-18T08:40:00Z",
+      "location": { "lat": 12.912, "lng": 80.229 }
+    }
+  ],
+  "predictions": [
+    {
+      "id": "pred-1",
+      "roadName": "Ambattur Industrial Estate",
+      "riskScore": 0.85,
+      "predictedFailureDays": 35,
+      "crackDensity": 0.62
+    }
+  ],
+  "budgetPlan": [
+    {
+      "id": "budget-1",
+      "roadName": "OMR IT Corridor",
+      "priority": "Critical",
+      "estimatedCostInr": 310000,
+      "reason": "High severity cluster near IT parks"
+    }
+  ],
+  "activityFeed": [
+    "Depth model processed 18 new frames (08:30)."
+  ]
+}
 ```
 
 ## Mock + real backend integration
 
 **Default (mock data)**
-- The app includes `src/api/mockPotholes.json` and uses it automatically unless `VITE_USE_MOCK=false` and `VITE_API_BASE_URL` is defined.
+- The app includes `src/api/mockDashboard.json` and uses it automatically unless `VITE_USE_MOCK=false` and `VITE_API_BASE_URL` is defined.
 
 **Real backend**
 - Example FastAPI endpoint:
@@ -36,13 +75,50 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-@app.get("/api/potholes")
-async def get_potholes():
-    return [
-        {"id": 101, "severity": "HIGH", "cost": 4500},
-        {"id": 102, "severity": "MEDIUM", "cost": 2200},
-        {"id": 103, "severity": "LOW", "cost": 600},
-    ]
+@app.get("/api/dashboard")
+async def get_dashboard():
+    return {
+        "city": "Chennai",
+        "updatedAt": "2024-09-18T09:45:00Z",
+        "summary": {
+            "totalPotholes": 182,
+            "avgDepthCm": 9.6,
+            "totalEstimatedCostInr": 1245000,
+            "budgetCapInr": 1500000,
+            "highSeverityCount": 42,
+        },
+        "potholes": [
+            {
+                "id": 9101,
+                "roadName": "OMR IT Corridor",
+                "severity": "HIGH",
+                "depthCm": 12.4,
+                "areaSqm": 1.4,
+                "estimatedCostInr": 18500,
+                "detectedAt": "2024-09-18T08:40:00Z",
+                "location": {"lat": 12.912, "lng": 80.229},
+            }
+        ],
+        "predictions": [
+            {
+                "id": "pred-1",
+                "roadName": "Ambattur Industrial Estate",
+                "riskScore": 0.85,
+                "predictedFailureDays": 35,
+                "crackDensity": 0.62,
+            }
+        ],
+        "budgetPlan": [
+            {
+                "id": "budget-1",
+                "roadName": "OMR IT Corridor",
+                "priority": "Critical",
+                "estimatedCostInr": 310000,
+                "reason": "High severity cluster near IT parks",
+            }
+        ],
+        "activityFeed": ["Depth model processed 18 new frames (08:30)."],
+    }
 ```
 
 - Run with real data:

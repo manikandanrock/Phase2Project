@@ -1,66 +1,85 @@
 import { Card, CardContent, Grid, Stack, Typography } from "@mui/material";
-import { PotholeSummary } from "../api/types";
+import { DashboardSummary } from "../api/types";
 
-interface SummaryCardsProps {
-  summary: PotholeSummary;
+interface OverviewCardsProps {
+  summary: DashboardSummary;
 }
 
 const formatCurrency = (value: number) =>
-  new Intl.NumberFormat("en-US", {
+  new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "USD",
+    currency: "INR",
     maximumFractionDigits: 0
   }).format(value);
 
-export default function SummaryCards({ summary }: SummaryCardsProps) {
+export default function OverviewCards({ summary }: OverviewCardsProps) {
+  const budgetUsage = Math.min((summary.totalEstimatedCostInr / summary.budgetCapInr) * 100, 100);
+
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12} md={4}>
+      <Grid item xs={12} md={3}>
         <Card sx={{ height: "100%" }}>
           <CardContent>
             <Stack spacing={1}>
               <Typography variant="overline" color="text.secondary">
-                Total potholes
+                Active potholes
               </Typography>
               <Typography variant="h4" fontWeight={600}>
-                {summary.total}
+                {summary.totalPotholes}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Across all inspected corridors
+                {summary.highSeverityCount} high severity
               </Typography>
             </Stack>
           </CardContent>
         </Card>
       </Grid>
-      <Grid item xs={12} md={4}>
+      <Grid item xs={12} md={3}>
         <Card sx={{ height: "100%" }}>
           <CardContent>
             <Stack spacing={1}>
               <Typography variant="overline" color="text.secondary">
-                Estimated remediation cost
+                Average depth
               </Typography>
               <Typography variant="h4" fontWeight={600}>
-                {formatCurrency(summary.totalCost)}
+                {summary.avgDepthCm.toFixed(1)} cm
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Based on current severity model
+                Depth Anything V2 estimates
               </Typography>
             </Stack>
           </CardContent>
         </Card>
       </Grid>
-      <Grid item xs={12} md={4}>
+      <Grid item xs={12} md={3}>
         <Card sx={{ height: "100%" }}>
           <CardContent>
             <Stack spacing={1}>
               <Typography variant="overline" color="text.secondary">
-                High severity findings
+                Estimated spend
               </Typography>
               <Typography variant="h4" fontWeight={600}>
-                {summary.highCount}
+                {formatCurrency(summary.totalEstimatedCostInr)}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Require immediate scheduling
+                Budget cap {formatCurrency(summary.budgetCapInr)}
+              </Typography>
+            </Stack>
+          </CardContent>
+        </Card>
+      </Grid>
+      <Grid item xs={12} md={3}>
+        <Card sx={{ height: "100%" }}>
+          <CardContent>
+            <Stack spacing={1}>
+              <Typography variant="overline" color="text.secondary">
+                Budget utilization
+              </Typography>
+              <Typography variant="h4" fontWeight={600}>
+                {budgetUsage.toFixed(0)}%
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Optimized repair allocation
               </Typography>
             </Stack>
           </CardContent>

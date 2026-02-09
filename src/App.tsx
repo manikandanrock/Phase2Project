@@ -1,80 +1,87 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Container, CssBaseline, Grid, Stack } from "@mui/material";
 import Header from "./components/Header";
-import SummaryCards from "./components/SummaryCards";
-import SeverityChart from "./components/SeverityChart";
+import OverviewCards from "./components/OverviewCards";
+import PredictionPanel from "./components/PredictionPanel";
+import BudgetPlanner from "./components/BudgetPlanner";
 import PotholeTable from "./components/PotholeTable";
 import StatusFeedback from "./components/StatusFeedback";
-import { fetchPotholes } from "./api/potholes";
-import { Pothole, PotholeSummary } from "./api/types";
+import MapPanel from "./components/MapPanel";
+import ActivityFeed from "./components/ActivityFeed";
+import { fetchDashboard } from "./api/dashboard";
+import { DashboardData } from "./api/types";
 
-const summarize = (potholes: Pothole[]): PotholeSummary => {
-  const bySeverity: PotholeSummary["bySeverity"] = {
-    LOW: 0,
-    MEDIUM: 0,
-    HIGH: 0
-  };
-
-  const totalCost = potholes.reduce((sum, pothole) => {
-    bySeverity[pothole.severity] += 1;
-    return sum + pothole.cost;
-  }, 0);
-
-  return {
-    total: potholes.length,
-    totalCost,
-    highCount: bySeverity.HIGH,
-    bySeverity
-  };
+const initialState: DashboardData = {
+  city: "",
+  updatedAt: new Date().toISOString(),
+  summary: {
+    totalPotholes: 0,
+    avgDepthCm: 0,
+    totalEstimatedCostInr: 0,
+    budgetCapInr: 1,
+    highSeverityCount: 0
+  },
+  potholes: [],
+  predictions: [],
+  budgetPlan: [],
+  activityFeed: []
 };
 
 function App() {
-  const [potholes, setPotholes] = useState<Pothole[]>([]);
+  const [data, setData] = useState<DashboardData>(initialState);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let active = true;
-
-    fetchPotholes()
-      .then((data) => {
-        if (active) {
-          setPotholes(data);
-          setError(null);
-        }
+  const loadDashboard = useCallback(() => {
+    setLoading(true);
+    fetchDashboard()
+      .then((response) => {
+        setData(response);
+        setError(null);
       })
       .catch((err: Error) => {
-        if (active) {
-          setError(`Unable to load pothole data: ${err.message}`);
-        }
+        setError(`Unable to load dashboard data: ${err.message}`);
       })
       .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
+        setLoading(false);
       });
-
-    return () => {
-      active = false;
-    };
   }, []);
 
-  const summary = useMemo(() => summarize(potholes), [potholes]);
+  useEffect(() => {
+    loadDashboard();
+    const interval = window.setInterval(loadDashboard, 60000);
+    return () => window.clearInterval(interval);
+  }, [loadDashboard]);
+
+  const hasData = useMemo(() => data.potholes.length > 0, [data.potholes.length]);
 
   return (
     <Box sx={{ bgcolor: "#f5f6fa", minHeight: "100vh" }}>
       <CssBaseline />
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Stack spacing={3}>
-          <Header />
-          <StatusFeedback loading={loading} error={error} hasData={potholes.length > 0} />
-          <SummaryCards summary={summary} />
+          <Header city={data.city} lastUpdated={data.updatedAt} onRefresh={loadDashboard} loading={loading} />
+          <StatusFeedback loading={loading} error={error} hasData={hasData} />
+          <OverviewCards summary={data.summary} />
           <Grid container spacing={2}>
-            <Grid item xs={12} md={5}>
-              <SeverityChart summary={summary} />
-            </Grid>
             <Grid item xs={12} md={7}>
-              <PotholeTable potholes={potholes} />
+              <MapPanel potholes={data.potholes} />
+            </Grid>
+            <Grid item xs={12} md={5}>
+              <PredictionPanel predictions={data.predictions} />
+            </Grid>
+          </Grid>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <BudgetPlanner items={data.budgetPlan} />
+            </Grid>
+          </Grid>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={7}>
+              <PotholeTable potholes={data.potholes} />
+            </Grid>
+            <Grid item xs={12} md={5}>
+              <ActivityFeed items={data.activityFeed} />
             </Grid>
           </Grid>
         </Stack>

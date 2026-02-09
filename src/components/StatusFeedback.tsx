@@ -11,7 +11,7 @@ export default function StatusFeedback({ loading, error, hasData }: StatusFeedba
     return (
       <Stack direction="row" spacing={2} alignItems="center" sx={{ py: 4 }}>
         <CircularProgress size={28} />
-        <Typography>Loading pothole intelligence…</Typography>
+        <Typography>Loading Gov-RoadAI intelligence…</Typography>
       </Stack>
     );
   }
@@ -21,7 +21,7 @@ export default function StatusFeedback({ loading, error, hasData }: StatusFeedba
   }
 
   if (!hasData) {
-    return <Alert severity="info">No pothole records found. Try refreshing the feed.</Alert>;
+    return <Alert severity="info">No detections available. Check data ingestion status.</Alert>;
   }
 
   return null;
