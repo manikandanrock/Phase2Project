@@ -1,0 +1,105 @@
+{
+  "city": "Chennai",
+  "updatedAt": "2024-09-18T09:45:00Z",
+  "summary": {
+    "totalPotholes": 182,
+    "avgDepthCm": 9.6,
+    "totalEstimatedCostInr": 1245000,
+    "budgetCapInr": 1500000,
+    "highSeverityCount": 42
+  },
+  "potholes": [
+    {
+      "id": 9101,
+      "roadName": "OMR IT Corridor",
+      "severity": "HIGH",
+      "depthCm": 12.4,
+      "areaSqm": 1.4,
+      "estimatedCostInr": 18500,
+      "detectedAt": "2024-09-18T08:40:00Z",
+      "location": { "lat": 12.912, "lng": 80.229 }
+    },
+    {
+      "id": 9102,
+      "roadName": "Mount Road",
+      "severity": "MEDIUM",
+      "depthCm": 8.1,
+      "areaSqm": 0.9,
+      "estimatedCostInr": 9200,
+      "detectedAt": "2024-09-18T08:10:00Z",
+      "location": { "lat": 13.056, "lng": 80.256 }
+    },
+    {
+      "id": 9103,
+      "roadName": "Velachery Main Rd",
+      "severity": "LOW",
+      "depthCm": 4.2,
+      "areaSqm": 0.5,
+      "estimatedCostInr": 4200,
+      "detectedAt": "2024-09-18T07:58:00Z",
+      "location": { "lat": 12.979, "lng": 80.219 }
+    },
+    {
+      "id": 9104,
+      "roadName": "GST Road",
+      "severity": "HIGH",
+      "depthCm": 11.6,
+      "areaSqm": 1.2,
+      "estimatedCostInr": 16800,
+      "detectedAt": "2024-09-18T07:40:00Z",
+      "location": { "lat": 12.927, "lng": 80.110 }
+    }
+  ],
+  "predictions": [
+    {
+      "id": "pred-1",
+      "roadName": "Ambattur Industrial Estate",
+      "riskScore": 0.85,
+      "predictedFailureDays": 35,
+      "crackDensity": 0.62
+    },
+    {
+      "id": "pred-2",
+      "roadName": "Anna Nagar 3rd Ave",
+      "riskScore": 0.63,
+      "predictedFailureDays": 52,
+      "crackDensity": 0.48
+    },
+    {
+      "id": "pred-3",
+      "roadName": "East Coast Road",
+      "riskScore": 0.78,
+      "predictedFailureDays": 41,
+      "crackDensity": 0.57
+    }
+  ],
+  "budgetPlan": [
+    {
+      "id": "budget-1",
+      "roadName": "OMR IT Corridor",
+      "priority": "Critical",
+      "estimatedCostInr": 310000,
+      "reason": "High severity cluster near IT parks"
+    },
+    {
+      "id": "budget-2",
+      "roadName": "GST Road",
+      "priority": "High",
+      "estimatedCostInr": 260000,
+      "reason": "Arterial route with repeated deep defects"
+    },
+    {
+      "id": "budget-3",
+      "roadName": "Velachery Main Rd",
+      "priority": "Medium",
+      "estimatedCostInr": 185000,
+      "reason": "Preventive patching before monsoon"
+    }
+  ],
+  "activityFeed": [
+    "Depth model processed 18 new frames (08:30).",
+    "Budget optimizer allocated ₹310k for OMR corridor.",
+    "Warning issued for Ambattur Industrial Estate (85% failure risk).",
+    "New pothole detected on GST Road (depth 11.6 cm)."
+  ]
+}
